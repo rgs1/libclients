@@ -1,0 +1,3 @@
+[submodule "libsmall"]
+	path = libsmall
+	url = git@github.com:rgs1/libsmall.git

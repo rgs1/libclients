@@ -1,0 +1,10 @@
+LIBCLIENT_1 {
+global:
+        clients_new;
+        clients_run;
+        clients_add_arg;
+        clients_context_data;
+        clients_context_get_arg;
+local:
+        *;
+};
