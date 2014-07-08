@@ -85,7 +85,6 @@ my_CFLAGS="\
 -Wshadow \
 -Wsign-compare \
 -Wstrict-prototypes \
--Wtype-limits \
 -I${ZK_HEADERS_PATH} \
 "
 AC_SUBST([my_CFLAGS])
