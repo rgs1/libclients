@@ -19,3 +19,4 @@ create-ephemerals
 get-children-with-watch
 src/libclients.pc
 *.tar.gz
+create-multiple-ephemerals

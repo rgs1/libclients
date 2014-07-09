@@ -60,10 +60,14 @@ CLEANFILES += src/libclients.pc
 
 bin_PROGRAMS = \
 	create-ephemerals \
+	create-multiple-ephemerals \
 	get-children-with-watch
 
 create_ephemerals_SOURCES = src/create-ephemerals.c
 create_ephemerals_LDADD = src/libclients.la
+
+create_multiple_ephemerals_SOURCES = src/create-multiple-ephemerals.c
+create_multiple_ephemerals_LDADD = src/libclients.la
 
 get_children_with_watch_SOURCES = src/get-children-with-watch.c
 get_children_with_watch_LDADD = src/libclients.la

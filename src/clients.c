@@ -151,9 +151,16 @@ CLIENTS_EXPORT void clients_add_arg(
   argparser_add(c->argparser, argname, chr, argvalue, desc);
 }
 
-CLIENTS_EXPORT const char *clients_context_get_arg(session_context *context, const char *arg)
+CLIENTS_EXPORT
+const char *clients_context_get_arg(session_context *context, const char *arg)
 {
   return (const char *)argparser_get_str(context->c->argparser, arg);
+}
+
+CLIENTS_EXPORT
+int clients_context_get_arg_int(session_context *context, const char *arg)
+{
+  return argparser_get_int(context->c->argparser, arg);
 }
 
 static void clients_start_child_proc(clients *c, int child_num)
