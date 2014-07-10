@@ -43,7 +43,7 @@ struct clients {
   void *(*new_watcher_data)(void);
   void (*reset_watcher_data)(void *);
   int epfd;
-  connection *zhs; /* state & meta-state for all zk clients */
+  connection *conns; /* state & meta-state for all zk clients */
 };
 
 struct connection {
@@ -57,8 +57,8 @@ struct connection {
 
 struct session_context {
   clients *c;
+  connection *conn;
   void *data;
-  int pos;
 };
 
 
@@ -85,6 +85,7 @@ CLIENTS_EXPORT clients * clients_new(
 
   ap = c->argparser = argparser_new(20);
 
+  argparser_add(ap, "debug", 'G', "false", "Turn on debugging for logs");
   argparser_add(ap, "max-events", 'e', "100", "Set the max number of events");
   argparser_add(ap, "num-clients", 'c', "500", "Set the number of clients");
   argparser_add(ap, "num-procs", 'p', "20", "Set the number of processes");
@@ -114,7 +115,8 @@ CLIENTS_EXPORT void clients_run(clients *c, int argc, const char **argv)
   if (!argparser_get_argc(ap))
     error(EXIT_BAD_PARAMS, "Server name not given.");
 
-  zoo_set_debug_level(ZOO_LOG_LEVEL_DEBUG);
+  if (!strcmp(argparser_get_str(ap, "debug"), "true"))
+    zoo_set_debug_level(ZOO_LOG_LEVEL_DEBUG);
 
   prctl(PR_SET_NAME, "parent", 0, 0, 0);
 
@@ -136,9 +138,16 @@ CLIENTS_EXPORT void clients_run(clients *c, int argc, const char **argv)
 }
 
 
-CLIENTS_EXPORT void *clients_context_data(session_context *context)
+CLIENTS_EXPORT
+void *clients_context_data(session_context *context)
 {
   return context->data;
+}
+
+CLIENTS_EXPORT
+zhandle_t *clients_context_zoo_handle(session_context *context)
+{
+  return context->conn->zh;
 }
 
 CLIENTS_EXPORT void clients_add_arg(
@@ -183,7 +192,7 @@ static void clients_start_child_proc(clients *c, int child_num)
   /* for threads needing clients */
   queue_set_user_data(q, (void *)c);
 
-  c->zhs = (connection *)safe_alloc(sizeof(connection) * num_clients);
+  c->conns = (connection *)safe_alloc(sizeof(connection) * num_clients);
 
   c->epfd = epoll_create(1);
   if (c->epfd == -1) {
@@ -195,7 +204,7 @@ static void clients_start_child_proc(clients *c, int child_num)
 
   /* prepare locks */
   for (j=0; j < num_clients; j++) {
-    if (pthread_mutex_init(&c->zhs[j].lock, 0)) {
+    if (pthread_mutex_init(&c->conns[j].lock, 0)) {
       error(EXIT_SYSTEM_CALL, "Failed to init mutex");
     }
   }
@@ -255,7 +264,7 @@ static void *clients_check_interests(void *data)
   while (1) {
     /* Lets see what new interests we've got (i.e.: new Pings, etc) */
     for (j=0; j < num_clients; j++) {
-      do_check_interests(c, &c->zhs[j]);
+      do_check_interests(c, &c->conns[j]);
     }
 
     nanosleep(&req, NULL);
@@ -333,14 +342,14 @@ static void * clients_create_zk_clients(void *data)
     session_context *context = safe_alloc(sizeof(session_context));
 
     context->c = c;
-    context->pos = j; /* a pointer to connection * would be better */
     context->data = c->new_watcher_data();
 
-    pthread_mutex_lock(&c->zhs[j].lock);
-    c->zhs[j].server = server;
-    c->zhs[j].session_timeout = session_timeout;
-    create_zk_client(c, &c->zhs[j], context);
-    pthread_mutex_unlock(&c->zhs[j].lock);
+    pthread_mutex_lock(&c->conns[j].lock);
+    c->conns[j].server = server;
+    c->conns[j].session_timeout = session_timeout;
+    context->conn = &c->conns[j];
+    create_zk_client(c, &c->conns[j], context);
+    pthread_mutex_unlock(&c->conns[j].lock);
 
     if (after > 0 && j > 0 && j % after == 0) {
       info("Sleeping for %d secs after having created %d clients",
@@ -473,7 +482,7 @@ static void watcher(zhandle_t *zzh, int type, int state, const char *path, void 
 
     /* create a new session */
     c->reset_watcher_data(context->data);
-    create_zk_client(c, &c->zhs[context->pos], context);
+    create_zk_client(c, context->conn, context);
   } else {
     /* dispatch the event to the "real" watcher */
     c->watcher(zzh, type, state, path);

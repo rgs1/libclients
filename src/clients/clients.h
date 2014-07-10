@@ -15,5 +15,6 @@ void clients_add_arg(clients *c, const char *name, char chr, const char *value, 
 void *clients_context_data(session_context *context);
 const char *clients_context_get_arg(session_context *context, const char *arg);
 int clients_context_get_arg_int(session_context *context, const char *arg);
+zhandle_t *clients_context_zoo_handle(session_context *context);
 
 #endif
