@@ -61,6 +61,7 @@ CLEANFILES += src/libclients.pc
 bin_PROGRAMS = \
 	create-ephemerals \
 	create-multiple-ephemerals \
+	create-delete-ephemerals \
 	get-children-with-watch \
 	create-idle-clients
 
@@ -72,6 +73,9 @@ create_idle_clients_LDADD = src/libclients.la
 
 create_multiple_ephemerals_SOURCES = src/create-multiple-ephemerals.c
 create_multiple_ephemerals_LDADD = src/libclients.la
+
+create_delete_ephemerals_SOURCES = src/create-delete-ephemerals.c
+create_delete_ephemerals_LDADD = src/libclients.la
 
 get_children_with_watch_SOURCES = src/get-children-with-watch.c
 get_children_with_watch_LDADD = src/libclients.la

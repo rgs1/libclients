@@ -21,3 +21,4 @@ src/libclients.pc
 *.tar.gz
 create-multiple-ephemerals
 create-idle-clients
+create-delete-ephemerals
