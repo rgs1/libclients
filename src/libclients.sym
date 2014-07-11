@@ -6,7 +6,8 @@ global:
         clients_context_data;
         clients_context_get_arg;
         clients_context_get_arg_int;
-        clients_context_zoo_handle;
+        clients_context_take_handle;
+        clients_context_put_handle;
 local:
         *;
 };

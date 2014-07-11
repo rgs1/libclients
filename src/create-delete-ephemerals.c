@@ -49,12 +49,14 @@ static void *loop(void *data)
   path = clients_context_get_arg(context, "path");
   count = clients_context_get_arg_int(context, "ephemeral-count");
   sleep_time = clients_context_get_arg_int(context, "sleep-before-ops");
-  zh = clients_context_zoo_handle(context);
 
   q = queue_new(count);
 
   while (1) {
     /* create ephemerals */
+
+    zh = clients_context_take_handle(context); /* gets exclusive access to zhandle */
+
     for (i = 0; i < count; i++) {
       rc = zoo_acreate(zh,
                        path,
@@ -69,9 +71,14 @@ static void *loop(void *data)
         warn("Failed to issue create request");
     }
 
+    clients_context_put_handle(context); /* releases zhandle */
+
     sleep(sleep_time);
 
     /* now delete them.. */
+
+    zh = clients_context_take_handle(context); /* gets exclusive access to zhandle */
+
     while (!queue_empty(q)) {
       char *p = queue_remove(q);
 
@@ -86,6 +93,8 @@ static void *loop(void *data)
 
       free(p);
     }
+
+    clients_context_put_handle(context); /* releases zhandle */
 
     sleep(sleep_time);
   }

@@ -145,9 +145,16 @@ void *clients_context_data(session_context *context)
 }
 
 CLIENTS_EXPORT
-zhandle_t *clients_context_zoo_handle(session_context *context)
+zhandle_t *clients_context_take_handle(session_context *context)
 {
+  pthread_mutex_lock(&context->conn->lock);
   return context->conn->zh;
+}
+
+CLIENTS_EXPORT
+void clients_context_put_handle(session_context *context)
+{
+  pthread_mutex_unlock(&context->conn->lock);
 }
 
 CLIENTS_EXPORT void clients_add_arg(
