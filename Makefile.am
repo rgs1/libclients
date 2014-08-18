@@ -63,6 +63,7 @@ bin_PROGRAMS = \
 	create-multiple-ephemerals \
 	create-delete-ephemerals \
 	get-children-with-watch \
+	get-data-with-watch \
 	create-idle-clients
 
 create_ephemerals_SOURCES = src/create-ephemerals.c
@@ -79,3 +80,6 @@ create_delete_ephemerals_LDADD = src/libclients.la
 
 get_children_with_watch_SOURCES = src/get-children-with-watch.c
 get_children_with_watch_LDADD = src/libclients.la
+
+get_data_with_watch_SOURCES = src/get-data-with-watch.c
+get_data_with_watch_LDADD = src/libclients.la

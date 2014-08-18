@@ -17,6 +17,7 @@ Makefile.in
 src/*~
 create-ephemerals
 get-children-with-watch
+get-data-with-watch
 src/libclients.pc
 *.tar.gz
 create-multiple-ephemerals
