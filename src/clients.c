@@ -151,6 +151,13 @@ zhandle_t *clients_context_take_handle(session_context *context)
   return context->conn->zh;
 }
 
+/* lockless */
+CLIENTS_EXPORT
+zhandle_t *clients_context_handle(session_context *context)
+{
+  return context->conn->zh;
+}
+
 CLIENTS_EXPORT
 void clients_context_put_handle(session_context *context)
 {

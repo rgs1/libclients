@@ -17,5 +17,7 @@ const char *clients_context_get_arg(session_context *context, const char *arg);
 int clients_context_get_arg_int(session_context *context, const char *arg);
 zhandle_t *clients_context_take_handle(session_context *context);
 void clients_context_put_handle(session_context *context);
+/* get handle without taking the lock */
+zhandle_t *clients_context_handle(session_context *context);
 
 #endif
