@@ -59,12 +59,13 @@ EXTRA_DIST += src/libclients.pc.in
 CLEANFILES += src/libclients.pc
 
 bin_PROGRAMS = \
-	create-ephemerals \
-	create-multiple-ephemerals \
 	create-delete-ephemerals \
+	create-ephemerals \
+	create-idle-clients \
+	create-multiple-ephemerals \
 	get-children-with-watch \
 	get-data-with-watch \
-	create-idle-clients
+	poll-path
 
 create_ephemerals_SOURCES = src/create-ephemerals.c
 create_ephemerals_LDADD = src/libclients.la
@@ -83,3 +84,6 @@ get_children_with_watch_LDADD = src/libclients.la
 
 get_data_with_watch_SOURCES = src/get-data-with-watch.c
 get_data_with_watch_LDADD = src/libclients.la
+
+poll_path_SOURCES = src/poll-path.c
+poll_path_LDADD = src/libclients.la

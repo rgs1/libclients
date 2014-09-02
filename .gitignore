@@ -23,3 +23,4 @@ src/libclients.pc
 create-multiple-ephemerals
 create-idle-clients
 create-delete-ephemerals
+poll-path
